@@ -107,5 +107,46 @@
   <!-- Scripts -->
   <script src="js/config.js"></script>
   <script src="js/delta.js"></script>
+  
+  <script>
+    // Check authentication on page load
+    async function checkAuth() {
+      try {
+        const response = await fetch(API_CONFIG.getUrl(API_CONFIG.ENDPOINTS.CHECK_AUTH), {
+          credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (!data.authenticated) {
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        // Update profile with user data
+        if (data.user) {
+          const profileName = document.getElementById('profileName');
+          const dropdownName = document.getElementById('dropdownName');
+          const dropdownUsername = document.getElementById('dropdownUsername');
+          const dropdownAvatar = document.getElementById('dropdownAvatar');
+          
+          if (profileName) profileName.textContent = data.user.name || data.user.username;
+          if (dropdownName) dropdownName.textContent = data.user.name || data.user.username;
+          if (dropdownUsername) dropdownUsername.textContent = '@' + data.user.username;
+          
+          // Update avatar initial
+          if (dropdownAvatar) {
+            const initial = (data.user.name || data.user.username).charAt(0).toUpperCase();
+            dropdownAvatar.textContent = initial;
+          }
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        window.location.href = 'login.html';
+      }
+    }
+    
+    // Run auth check on page load
+    checkAuth();
+  </script>
 </body>
 </html>
